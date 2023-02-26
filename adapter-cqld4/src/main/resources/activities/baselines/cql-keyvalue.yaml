@@ -17,6 +17,10 @@ scenarios:
     schema: run driver=cql tags==block:schema-astra threads==1 cycles==UNDEF
     rampup: run driver=cql tags==block:rampup cycles===TEMPLATE(rampup-cycles,10000000) threads=auto
     main: run driver=cql tags=='block:main-.*' cycles===TEMPLATE(main-cycles,10000000) threads=auto
+  basic_check:
+    schema: run driver=cql tags==block:schema threads==1 cycles==UNDEF
+    rampup: run driver=cql tags==block:rampup cycles===TEMPLATE(rampup-cycles,10) threads=auto
+    main: run driver=cql tags=='block:main-.*' cycles===TEMPLATE(main-cycles,10) threads=auto
 
 bindings:
   seq_key: Mod(<<keycount:1000000000>>); ToString() -> String
@@ -30,7 +34,7 @@ blocks:
       create-keyspace:
         raw: |
           create keyspace if not exists TEMPLATE(keyspace,baselines)
-          WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 'TEMPLATE(rf,1)>>'}
+          WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 'TEMPLATE(rf,1)'}
           AND durable_writes = true;
       create-table:
         raw: |

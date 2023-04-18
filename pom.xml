@@ -65,6 +65,7 @@
         <module.adapter-s4j>adapter-s4j</module.adapter-s4j>
         <module.adapter-kafka>adapter-kafka</module.adapter-kafka>
         <module.adapter-jdbc>adapter-jdbc</module.adapter-jdbc>
+        <module.adapter-scylladb>adapter-scylladb</module.adapter-scylladb>
 
         <!-- VIRTDATA MODULES -->
         <module.virtdata-api>virtdata-api</module.virtdata-api>
@@ -109,6 +110,7 @@
         <module>adapter-s4j</module>
         <module>adapter-kafka</module>
         <module>adapter-jdbc</module>
+        <module>adapter-scylladb</module>
 
         <!-- VIRTDATA MODULES -->
         <module>virtdata-api</module>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 nosqlbench
+ * Copyright (c) 2022-2023 nosqlbench
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.engine.activityimpl.ParameterMap;
-import io.nosqlbench.api.engine.util.Unit;
+//import io.nosqlbench.api.engine.util.Unit;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -149,13 +148,6 @@ public class RateSpec {
         this.opsPerSec = opsPerSec;
         this.burstRatio = burstRatio;
         this.verb = type;
-    }
-
-    public RateSpec(ParameterMap.NamedParameter tuple) {
-        this(tuple.value);
-        if (tuple.name.startsWith("co_")) {
-            logger.warn("The co_ prefix on " + tuple.name + " is no longer needed. All rate limiters now provide standard coordinated omission metrics.");
-        }
     }
 
     public RateSpec(String spec) {

@@ -27,7 +27,7 @@ import io.nosqlbench.engine.api.activityapi.cyclelog.buffers.results.CycleResult
 import io.nosqlbench.engine.api.activityapi.cyclelog.buffers.results.CycleSegment;
 import io.nosqlbench.engine.api.activityapi.input.Input;
 import io.nosqlbench.engine.api.activityapi.output.Output;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiter;
+import io.nosqlbench.nb.ratelimiter.RateLimiter;
 import io.nosqlbench.api.engine.activityimpl.ActivityDef;
 import io.nosqlbench.engine.api.activityimpl.MotorState;
 import org.apache.logging.log4j.Logger;

@@ -14,8 +14,24 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.sysperf;
 
-public interface DiagUpdateRate {
-    void setDiagModulo(long diagModulo);
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
+
+public class SysBenchMethodParkNanos {
+
+    @Benchmark
+    @BenchmarkMode({Mode.AverageTime})
+    @OutputTimeUnit(TimeUnit.NANOSECONDS)
+    @Threads(1)
+    @Warmup(iterations=1, timeUnit= TimeUnit.SECONDS,time=10)
+    @Measurement(iterations=1,timeUnit=TimeUnit.SECONDS,time=10)
+    public void callLockSupportParkNanos(Blackhole spaceTimeSwirls) {
+        LockSupport.parkNanos(1);
+    }
+
 }

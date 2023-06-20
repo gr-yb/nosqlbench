@@ -26,7 +26,7 @@ import io.nosqlbench.engine.api.activityapi.cyclelog.filters.IntPredicateDispens
 import io.nosqlbench.engine.api.activityapi.errorhandling.ErrorMetrics;
 import io.nosqlbench.engine.api.activityapi.input.InputDispenser;
 import io.nosqlbench.engine.api.activityapi.output.OutputDispenser;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiter;
+import io.nosqlbench.nb.ratelimiter.RateLimiter;
 import io.nosqlbench.engine.api.activityimpl.SimpleActivity;
 import io.nosqlbench.engine.api.activityimpl.motor.RunStateTally;
 

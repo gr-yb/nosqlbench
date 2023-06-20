@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.config.NBLabeledElement;
 import io.nosqlbench.nb.annotations.Service;
+import io.nosqlbench.nb.testutils.Colors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static io.nosqlbench.engine.api.util.Colors.*;
+import java.util.Map;
 
 /**
  * <h2>Synopsis</h2>
@@ -70,7 +70,7 @@ public class ThreadDrivenTokenPool implements TokenPool {
      *
      * @param rateSpec a {@link RateSpec}
      */
-    public ThreadDrivenTokenPool(final RateSpec rateSpec, final NBLabeledElement named) {
+    public ThreadDrivenTokenPool(final RateSpec rateSpec, final Map<String,String> named) {
         this.apply(named,rateSpec);
         ThreadDrivenTokenPool.logger.debug(() -> "initialized token pool: " + this + " for rate:" + rateSpec);
 //        filler.start();
@@ -83,7 +83,7 @@ public class ThreadDrivenTokenPool implements TokenPool {
      * @param rateSpec The rate specifier.
      */
     @Override
-    public synchronized TokenPool apply(final NBLabeledElement labeled, final RateSpec rateSpec) {
+    public synchronized TokenPool apply(final Map<String,String> labeled, final RateSpec rateSpec) {
         this.rateSpec = rateSpec;
         maxActivePool = Math.max((long) 1.0E6, (long) (rateSpec.getNanosPerOp() * ThreadDrivenTokenPool.MIN_CONCURRENT_OPS));
         maxOverActivePool = (long) (this.maxActivePool * rateSpec.getBurstRatio());
@@ -216,10 +216,10 @@ public class ThreadDrivenTokenPool implements TokenPool {
 
         if (debugthis) {
             System.out.print(this);
-            System.out.print(ANSI_BrightBlue + " adding=" + allocatedToActivePool);
+            System.out.print(Colors.ANSI_BrightBlue + " adding=" + allocatedToActivePool);
             if (0 < allocatedToOverflowPool)
-                System.out.print(ANSI_Red + " OVERFLOW:" + allocatedToOverflowPool + ANSI_Reset);
-            if (0 < burstFill) System.out.print(ANSI_BrightGreen + " BACKFILL:" + burstFill + ANSI_Reset);
+                System.out.print(Colors.ANSI_Red + " OVERFLOW:" + allocatedToOverflowPool + Colors.ANSI_Reset);
+            if (0 < burstFill) System.out.print(Colors.ANSI_BrightGreen + " BACKFILL:" + burstFill + Colors.ANSI_Reset);
             System.out.println();
         }
         //System.out.println(this);

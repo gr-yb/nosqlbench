@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.config.NBLabeledElement;
-
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TestableHybridRateLimiter extends HybridRateLimiter {
 
     private final AtomicLong clock;
 
-    public TestableHybridRateLimiter(final AtomicLong clock, final RateSpec rateSpec, final NBLabeledElement def) {
+    public TestableHybridRateLimiter(final AtomicLong clock, final RateSpec rateSpec, final Map<String,String> def) {
         super(def, "test", rateSpec);
         this.applyRateSpec(rateSpec);
         this.setLabel("test");

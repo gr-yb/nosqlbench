@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.config.NBLabeledElement;
-import io.nosqlbench.api.testutils.Result;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateSpec.Verb;
+import io.nosqlbench.nb.ratelimiter.RateSpec.Verb;
+import io.nosqlbench.nb.testutils.Result;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.function.Function;
 
 /**
- * These tests are for sanity checking rate limiter implementations. They are not enabled by default,
+ * <P>These tests are for sanity checking rate limiter implementations. They are not enabled by default,
  * since they are very CPU an time intensive. If you are developing rate limiters, use these to understand
- * throughput variations at different speeds and different levels of contention.
+ * throughput variations at different speeds and different levels of contention.</P>
  *
- *  This set is for single-threaded (uncontended) baselines, at different op rates.
+ * <p>This set is for single-threaded (uncontended) baselines, at different op rates.</p>
  */
 public class TestRateLimiterPerfSingle {
 
-    private final Function<RateSpec, RateLimiter> rlFunction = rs -> new HybridRateLimiter(NBLabeledElement.forKV("alias","tokenrl"),"hybrid", rs.withVerb(Verb.start));
+    private final Function<RateSpec, RateLimiter> rlFunction = rs -> new HybridRateLimiter(Map.of("alias","tokenrl"),"hybrid", rs.withVerb(Verb.start));
     private final RateLimiterPerfTestMethods methods = new RateLimiterPerfTestMethods();
 
     @Test

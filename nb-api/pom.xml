@@ -61,6 +61,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.nosqlbench</groupId>
+            <artifactId>nb-ratelimiter</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.vladsch.flexmark</groupId>
             <artifactId>flexmark-ext-yaml-front-matter</artifactId>
             <version>0.64.6</version>

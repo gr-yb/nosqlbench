@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.config.NBLabels;
-import io.nosqlbench.api.engine.metrics.DeltaHdrHistogramReservoir;
-import io.nosqlbench.api.testutils.Bounds;
-import io.nosqlbench.api.testutils.Perf;
-import io.nosqlbench.api.testutils.Result;
+import com.codahale.metrics.Reservoir;
+import io.nosqlbench.nb.testutils.Bounds;
+import io.nosqlbench.nb.testutils.Colors;
+import io.nosqlbench.nb.testutils.Perf;
+import io.nosqlbench.nb.testutils.Result;
+import org.mpierce.metrics.reservoir.hdrhistogram.HdrHistogramReservoir;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static io.nosqlbench.engine.api.util.Colors.ANSI_Blue;
-import static io.nosqlbench.engine.api.util.Colors.ANSI_Reset;
 
 public class RateLimiterPerfTestMethods {
 
@@ -142,12 +141,12 @@ public class RateLimiterPerfTestMethods {
 
             System.out.println(rl);
 
-            System.out.println(ANSI_Blue +
+            System.out.println(Colors.ANSI_Blue +
                     String.format(
                             "spec: %s\n count: %9d, duration %.5fS, acquires/s %.3f, nanos/op: %f\n delay: %d (%.5fS)",
                             rl.getRateSpec(),
                             count, duration, acqops, 1_000_000_000.0d / acqops, divDelay, divDelay / 1_000_000_000.0d) +
-                    ANSI_Reset);
+                    Colors.ANSI_Reset);
 
         }
 
@@ -191,7 +190,7 @@ public class RateLimiterPerfTestMethods {
 
         System.out.format("Running %,d iterations split over %,d threads (%,d per) at %,.3f ops/s\n", iterations, threadCount, iterations / threadCount, rate);
         final Acquirer[] threads = new Acquirer[threadCount];
-        final DeltaHdrHistogramReservoir stats = new DeltaHdrHistogramReservoir(NBLabels.forKV("name", "times"), 5);
+        final Reservoir stats = new HdrHistogramReservoir();
 
         final CyclicBarrier barrier = new CyclicBarrier(threadCount + 1);
 
@@ -282,11 +281,11 @@ public class RateLimiterPerfTestMethods {
     private static class Acquirer implements Callable<Result>, Runnable {
         private final RateLimiter limiter;
         private final int threadIdx;
-        private final DeltaHdrHistogramReservoir reservoir;
+        private final Reservoir reservoir;
         private final CyclicBarrier barrier;
         private final long iterations;
 
-        public Acquirer(final int i, final RateLimiter limiter, final int iterations, final DeltaHdrHistogramReservoir reservoir, final CyclicBarrier barrier) {
+        public Acquirer(final int i, final RateLimiter limiter, final int iterations, final Reservoir reservoir, final CyclicBarrier barrier) {
             threadIdx = i;
             this.limiter = limiter;
             this.iterations = iterations;

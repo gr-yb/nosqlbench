@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import com.codahale.metrics.Timer;
-import io.nosqlbench.api.config.NBLabeledElement;
-import io.nosqlbench.api.engine.metrics.ActivityMetrics;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 import java.util.concurrent.locks.LockSupport;
 
 public class TokenFiller implements Runnable {
@@ -39,7 +36,7 @@ public class TokenFiller implements Runnable {
     private RateSpec rateSpec;
     private Thread thread;
     private volatile long lastRefillAt;
-    private final Timer timer;
+//    private final Timer timer;
 
     /**
      * A token filler adds tokens to a {@link ThreadDrivenTokenPool} at some rate.
@@ -47,10 +44,10 @@ public class TokenFiller implements Runnable {
      * in the JVM.
      *
      */
-    public TokenFiller(final RateSpec rateSpec, final ThreadDrivenTokenPool tokenPool, final NBLabeledElement labeled, final int hdrdigits) {
+    public TokenFiller(final RateSpec rateSpec, final ThreadDrivenTokenPool tokenPool, final Map<String,String> labeled, final int hdrdigits) {
         this.rateSpec = rateSpec;
         this.tokenPool = tokenPool;
-        timer = ActivityMetrics.timer(labeled, "tokenfiller", hdrdigits);
+//        timer = ActivityMetrics.timer(labeled, "tokenfiller", hdrdigits);
     }
 
     public TokenFiller apply(final RateSpec rateSpec) {
@@ -88,7 +85,7 @@ public class TokenFiller implements Runnable {
 
 //            System.out.println(ANSI_Blue + this + ANSI_Reset); System.out.flush();
             this.tokenPool.refill(delta);
-            this.timer.update(delta, TimeUnit.NANOSECONDS);
+//            this.timer.update(delta, TimeUnit.NANOSECONDS);
 //            iteration++;
 
         }

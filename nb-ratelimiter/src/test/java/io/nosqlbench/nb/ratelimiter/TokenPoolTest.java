@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.config.NBLabeledElement;
-import io.nosqlbench.api.config.NBLabels;
-import io.nosqlbench.api.engine.activityimpl.ActivityDef;
-import io.nosqlbench.api.engine.activityimpl.ParameterMap;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenPoolTest {
 
-    ActivityDef adef = new ActivityDef(ParameterMap.parseOrException("alias=testing"));
-    NBLabeledElement def = NBLabeledElement.forMap(this.adef.getParams().getStringStringMap());
+    Map<String,String> def = Map.of("alias","testing");
 
 
     @Test
@@ -63,12 +60,7 @@ public class TokenPoolTest {
         assertThat(p.getWaitTime()).isEqualTo(10000000L);
 
         RateSpec s2 = new RateSpec(1000000L, 1.10D);
-        p.apply(new NBLabeledElement() {
-            @Override
-            public NBLabels getLabels() {
-                return NBLabels.forKV("name","test");
-            }
-        },s2);
+        p.apply(Map.of("name","test"),s2);
 
 
     }

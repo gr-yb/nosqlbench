@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.config.NBLabeledElement;
-import io.nosqlbench.api.testutils.Perf;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateSpec.Verb;
+import io.nosqlbench.nb.ratelimiter.RateSpec.Verb;
+import io.nosqlbench.nb.testutils.Perf;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -33,11 +33,9 @@ import java.util.function.Function;
  */
 public class TestRateLimiterPerf1E8 {
 
-    NBLabeledElement def = NBLabeledElement.forKV("alias","tokenrl");
-
     private final Function<RateSpec, RateLimiter> rlFunction =
         rs -> new HybridRateLimiter(
-            this.def,
+            Map.of("alias","tokenrl"),
             "hybrid",
             rs.withVerb(Verb.configure)
         );

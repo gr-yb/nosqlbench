@@ -20,7 +20,7 @@ import io.nosqlbench.adapter.diag.optasks.DiagTask;
 import io.nosqlbench.api.config.standard.NBConfigModel;
 import io.nosqlbench.api.config.standard.NBConfiguration;
 import io.nosqlbench.api.config.standard.NBReconfigurable;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiter;
+import io.nosqlbench.nb.ratelimiter.RateLimiter;
 import io.nosqlbench.engine.api.activityimpl.BaseOpDispenser;
 import io.nosqlbench.engine.api.templating.ParsedOp;
 import io.nosqlbench.nb.annotations.ServiceSelector;

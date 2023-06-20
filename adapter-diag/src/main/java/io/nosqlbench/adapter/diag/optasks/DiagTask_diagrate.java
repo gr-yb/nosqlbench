@@ -17,9 +17,9 @@
 package io.nosqlbench.adapter.diag.optasks;
 
 import io.nosqlbench.api.config.standard.*;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiter;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiters;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateSpec;
+import io.nosqlbench.nb.ratelimiter.RateLimiter;
+import io.nosqlbench.nb.ratelimiter.RateLimiters;
+import io.nosqlbench.nb.ratelimiter.RateSpec;
 import io.nosqlbench.nb.annotations.Service;
 
 import java.util.Map;

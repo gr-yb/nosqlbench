@@ -14,31 +14,12 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import io.nosqlbench.api.config.NBLabeledElement;
+import io.nosqlbench.nb.ratelimiter.RateLimiter;
 
-public interface TokenPool {
+public interface TestableRateLimiter extends RateLimiter {
 
-    TokenPool apply(NBLabeledElement labeled, RateSpec rateSpec);
-
-    double getBurstRatio();
-
-    long takeUpTo(long amt);
-
-    long blockAndTake();
-
-    long blockAndTake(long tokens);
-
-    long getWaitTime();
-
-    long getWaitPool();
-
-    long getActivePool();
-
-    RateSpec getRateSpec();
-
-    long restart();
-
-    void start();
+    long setClock(long newValue);
+    long getClock();
 }

@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import com.codahale.metrics.Gauge;
-import io.nosqlbench.api.config.NBLabeledElement;
-import io.nosqlbench.api.config.NBNamedElement;
-import io.nosqlbench.engine.api.activityapi.core.Startable;
-import io.nosqlbench.api.engine.metrics.ActivityMetrics;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiters.BurstRateGauge;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiters.RateGauge;
-import io.nosqlbench.engine.api.activityapi.ratelimits.RateLimiters.WaitTimeGauge;
+//import com.codahale.metrics.Gauge;
+//import io.nosqlbench.api.config.NBLabeledElement;
+//import io.nosqlbench.api.engine.metrics.ActivityMetrics;
 import io.nosqlbench.nb.annotations.Service;
+//import io.nosqlbench.nb.ratelimiter.RateLimiters.BurstRateGauge;
+//import io.nosqlbench.nb.ratelimiter.RateLimiters.RateGauge;
+//import io.nosqlbench.nb.ratelimiter.RateLimiters.WaitTimeGauge;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -84,7 +83,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HybridRateLimiter implements RateLimiter {
 
     private static final Logger logger = LogManager.getLogger(HybridRateLimiter.class);
-    private NBLabeledElement named;
+    private Map<String,String> named;
 
     //private volatile TokenFiller filler;
     private volatile long starttime;
@@ -96,9 +95,9 @@ public class HybridRateLimiter implements RateLimiter {
     private String label;
     private State state = State.Idle;
     // metrics
-    private Gauge<Long> delayGauge;
-    private Gauge<Double> avgRateGauge;
-    private Gauge<Double> burstRateGauge;
+//    private Gauge<Long> delayGauge;
+//    private Gauge<Double> avgRateGauge;
+//    private Gauge<Double> burstRateGauge;
     private TokenPool tokens;
     // diagnostics
 
@@ -108,7 +107,7 @@ public class HybridRateLimiter implements RateLimiter {
     protected HybridRateLimiter() {
     }
 
-    public HybridRateLimiter(final NBLabeledElement named, final String label, final RateSpec rateSpec) {
+    public HybridRateLimiter(final Map<String,String> named, final String label, final RateSpec rateSpec) {
         this.label = label;
         this.init(named);
         this.named = named;
@@ -156,13 +155,13 @@ public class HybridRateLimiter implements RateLimiter {
     }
 
 
-    protected void init(final NBLabeledElement activityDef) {
-        delayGauge = ActivityMetrics.gauge(activityDef, this.label + ".waittime", new WaitTimeGauge(this));
-        avgRateGauge = ActivityMetrics.gauge(activityDef, this.label + ".config.cyclerate", new RateGauge(this));
-        burstRateGauge = ActivityMetrics.gauge(activityDef, this.label + ".config.burstrate", new BurstRateGauge(this));
+    protected void init(final Map<String,String> activityDef) {
+//        delayGauge = ActivityMetrics.gauge(activityDef, this.label + ".waittime", new WaitTimeGauge(this));
+//        avgRateGauge = ActivityMetrics.gauge(activityDef, this.label + ".config.cyclerate", new RateGauge(this));
+//        burstRateGauge = ActivityMetrics.gauge(activityDef, this.label + ".config.burstrate", new BurstRateGauge(this));
     }
 
-    @Override
+//    @Override
     public synchronized void start() {
 
         switch (this.state) {
@@ -229,18 +228,18 @@ public class HybridRateLimiter implements RateLimiter {
         Started
     }
 
-    private class PoolGauge implements Gauge<Long> {
-        private final HybridRateLimiter rl;
-
-        public PoolGauge(final HybridRateLimiter hybridRateLimiter) {
-            rl = hybridRateLimiter;
-        }
-
-        @Override
-        public Long getValue() {
-            final TokenPool pool = this.rl.tokens;
-            if (null == pool) return 0L;
-            return pool.getWaitTime();
-        }
-    }
+//    private class PoolGauge implements Gauge<Long> {
+//        private final HybridRateLimiter rl;
+//
+//        public PoolGauge(final HybridRateLimiter hybridRateLimiter) {
+//            rl = hybridRateLimiter;
+//        }
+//
+//        @Override
+//        public Long getValue() {
+//            final TokenPool pool = this.rl.tokens;
+//            if (null == pool) return 0L;
+//            return pool.getWaitTime();
+//        }
+//    }
 }

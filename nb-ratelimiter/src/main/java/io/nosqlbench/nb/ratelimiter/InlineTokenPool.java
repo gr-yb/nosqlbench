@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityapi.ratelimits;
+package io.nosqlbench.nb.ratelimiter;
 
-import com.codahale.metrics.Timer;
-import io.nosqlbench.api.config.NBLabeledElement;
-import io.nosqlbench.api.engine.activityimpl.ActivityDef;
-import io.nosqlbench.api.engine.metrics.ActivityMetrics;
+import io.nosqlbench.nb.testutils.Colors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.nio.channels.FileChannel.MapMode;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static io.nosqlbench.engine.api.util.Colors.*;
 
 /**
  * <h2>Synopsis</h2>
@@ -60,7 +54,7 @@ public class InlineTokenPool {
     private static final Logger logger = LogManager.getLogger(InlineTokenPool.class);
 
     public static final double MIN_CONCURRENT_OPS = 5;
-    private final NBLabeledElement parentLabels;
+    private final Map<String,String> parentLabels;
 
     // Size limit of active pool
     private long maxActivePoolSize;
@@ -84,7 +78,7 @@ public class InlineTokenPool {
     // The nanotime of the last refill
     private volatile long lastRefillAt;
     // metrics for refill
-    private final Timer refillTimer;
+//    private final Timer refillTimer;
     // update rate for refiller
     private final long interval = (long) 1.0E6;
 
@@ -106,22 +100,22 @@ public class InlineTokenPool {
      *
      * @param rateSpec a {@link RateSpec}
      */
-    public InlineTokenPool(final RateSpec rateSpec, final ActivityDef def, final NBLabeledElement parentLabels) {
+    public InlineTokenPool(final RateSpec rateSpec, final Map<String,String> parentLabels) {
         this.parentLabels = parentLabels;
         final ByteBuffer logbuf = this.getBuffer();
         this.apply(rateSpec);
         InlineTokenPool.logger.debug("initialized token pool: {} for rate:{}", this, rateSpec);
-        refillTimer = ActivityMetrics.timer(parentLabels, "tokenfiller",4);
+//        refillTimer = ActivityMetrics.timer(parentLabels, "tokenfiller",4);
     }
 
-    public InlineTokenPool(final long poolsize, final double burstRatio, final ActivityDef def, final NBLabeledElement parentLabels) {
+    public InlineTokenPool(final long poolsize, final double burstRatio, final Map<String,String> parentLabels) {
         this.parentLabels = parentLabels;
         final ByteBuffer logbuf = this.getBuffer();
         maxActivePoolSize = poolsize;
         this.burstRatio = burstRatio;
         maxActiveAndBurstSize = (long) (this.maxActivePoolSize * burstRatio);
         maxBurstPoolSize = this.maxActiveAndBurstSize - this.maxActivePoolSize;
-        refillTimer = ActivityMetrics.timer(parentLabels, "tokenfiller",4);
+//        refillTimer = ActivityMetrics.timer(parentLabels, "tokenfiller",4);
     }
 
     /**
@@ -294,10 +288,10 @@ public class InlineTokenPool {
 
         if (debugthis) {
             System.out.print(this);
-            System.out.print(ANSI_BrightBlue + " adding=" + allocatedToActivePool);
+            System.out.print(Colors.ANSI_BrightBlue + " adding=" + allocatedToActivePool);
             if (0 < allocatedToOverflowPool)
-                System.out.print(ANSI_Red + " OVERFLOW:" + allocatedToOverflowPool + ANSI_Reset);
-            if (0 < burstFill) System.out.print(ANSI_BrightGreen + " BACKFILL:" + burstFill + ANSI_Reset);
+                System.out.print(Colors.ANSI_Red + " OVERFLOW:" + allocatedToOverflowPool + Colors.ANSI_Reset);
+            if (0 < burstFill) System.out.print(Colors.ANSI_BrightGreen + " BACKFILL:" + burstFill + Colors.ANSI_Reset);
             System.out.println();
         }
 
@@ -359,7 +353,7 @@ public class InlineTokenPool {
 
         //System.out.println(this);
         this.refill(delta);
-        this.refillTimer.update(delta, TimeUnit.NANOSECONDS);
+//        this.refillTimer.update(delta, TimeUnit.NANOSECONDS);
 //            iteration++;
 
     }

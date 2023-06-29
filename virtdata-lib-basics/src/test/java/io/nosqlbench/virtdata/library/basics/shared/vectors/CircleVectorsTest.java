@@ -20,8 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CircleVectorsTest {
 
@@ -56,8 +55,11 @@ public class CircleVectorsTest {
             CircleVectors circleVectors = new CircleVectors(10,
                 "io.nosqlbench.virtdata.library.basics.shared.vectors.algorithms.GoldenAngle");
 
-            List<Object> result = circleVectors.apply(10);
+            List<Object> result = circleVectors.apply(1000);
             assert (result.size() == 3);
+            assertEquals(0.0f, result.get(0));
+            assertEquals(1.0f, result.get(1));
+            assertEquals(0.0f, result.get(2));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -69,8 +71,11 @@ public class CircleVectorsTest {
             CircleVectors circleVectors = new CircleVectors(10,
                 "io.nosqlbench.virtdata.library.basics.shared.vectors.algorithms.LatLonBased");
 
-            List<Object> result = circleVectors.apply(10);
+            List<Object> result = circleVectors.apply(1000);
             assert (result.size() == 3);
+            assertEquals(6.123234E-17f, result.get(0));
+            assertEquals(0.0f, result.get(1));
+            assertEquals(1.0f, result.get(2));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

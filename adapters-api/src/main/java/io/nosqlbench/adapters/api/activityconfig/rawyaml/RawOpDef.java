@@ -18,6 +18,8 @@ package io.nosqlbench.adapters.api.activityconfig.rawyaml;
 
 import io.nosqlbench.api.errors.BasicError;
 import io.nosqlbench.api.errors.OpConfigError;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -25,7 +27,13 @@ import java.util.*;
  * See specification for what this should do in UniformWorkloadSpecificationTest
  */
 public class RawOpDef extends RawOpFields {
+    private final static Logger logger = LogManager.getLogger(RawOpDef.class);
 
+    /**
+     * Contains all the op fields. If the key <em>params</em> is used, then fields are divided
+     * between the op fields map and the params map, with the non-specified one soaking up the dangling
+     * op fields. (Those not under 'op' or 'params' and which are not reserverd words)
+     */
     private Object op;
 
     private final static List<String> opFieldSynonyms = List.of("stmt", "statement", "op", "operation");
@@ -57,9 +65,19 @@ public class RawOpDef extends RawOpFields {
             }
         }
         if (found.size() == 1) {
-            Object op = map.remove(found.iterator().next());
-            setOp(op);
-        } else if (found.size() > 1) {
+            String keyName = found.iterator().next();
+            Object op = map.remove(keyName);
+            if (op instanceof CharSequence s) {
+                if (!keyName.equals("stmt")) {
+                    logger.warn("Used implied stmt field under name '" + keyName + "'. You can just use 'stmt: ... "+ s +"' or the equivalent to avoid this warning.");
+                }
+                map.put("stmt",s.toString());
+//                setOp(new LinkedHashMap<String,Object>(Map.of("stmt",s.toString())));
+            } else {
+                setOp(op);
+            }
+        }
+        if (found.size() > 1) {
             throw new BasicError("You used " + found + " as an op name, but only one of these is allowed at a time.");
         } else if ((getName() == null || getName().isEmpty()) && op == null && map.size() > 0) {
             Map.Entry<String, Object> first = map.entrySet().iterator().next();
@@ -93,6 +111,8 @@ public class RawOpDef extends RawOpFields {
     public String getStmt() {
         if (op instanceof CharSequence) {
             return op.toString();
+        } else if (op instanceof Map m && m.get("stmt") instanceof CharSequence cs) {
+            return cs.toString();
         } else {
             throw new BasicError("tried to access a non-char statement definition with #getStmt()");
         }

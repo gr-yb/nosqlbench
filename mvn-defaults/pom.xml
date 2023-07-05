@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
                 <artifactId>groovy</artifactId>
-                <version>3.0.14</version>
+                <version>3.0.17</version>
             </dependency>
 
             <dependency>
@@ -352,7 +352,7 @@
             <dependency>
                 <groupId>org.antlr</groupId>
                 <artifactId>antlr4-runtime</artifactId>
-                <version>4.12.0</version>
+                <version>4.13.0</version>
             </dependency>
 
             <dependency>
@@ -813,7 +813,7 @@
                 <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.12.0</version>
+                    <version>4.13.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

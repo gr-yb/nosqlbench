@@ -19,7 +19,10 @@ package io.nosqlbench.engine.api.templating;
 import io.nosqlbench.adapters.api.templating.StrInterpolator;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

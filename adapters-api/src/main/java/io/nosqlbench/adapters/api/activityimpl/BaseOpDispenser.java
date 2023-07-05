@@ -14,33 +14,40 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.activityimpl;
+package io.nosqlbench.adapters.api.activityimpl;
 
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Timer;
+import io.nosqlbench.adapters.api.activityimpl.uniform.DriverAdapter;
+import io.nosqlbench.adapters.api.activityimpl.uniform.flowtypes.Op;
+import io.nosqlbench.adapters.api.evalcontext.CycleFunction;
+import io.nosqlbench.adapters.api.evalcontext.GroovyBooleanCycleFunction;
+import io.nosqlbench.adapters.api.metrics.ThreadLocalNamedTimers;
+import io.nosqlbench.adapters.api.templating.ParsedOp;
 import io.nosqlbench.api.config.NBLabeledElement;
 import io.nosqlbench.api.config.NBLabels;
 import io.nosqlbench.api.engine.metrics.ActivityMetrics;
 import io.nosqlbench.api.errors.MVELCompilationError;
-import io.nosqlbench.engine.api.activityimpl.uniform.DriverAdapter;
-import io.nosqlbench.engine.api.activityimpl.uniform.flowtypes.Op;
-import io.nosqlbench.engine.api.metrics.ThreadLocalNamedTimers;
-import io.nosqlbench.engine.api.templating.ParsedOp;
+import io.nosqlbench.api.errors.OpConfigError;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mvel2.MVEL;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- *
  * See {@link OpDispenser} for details on how to use this type.
  * <p>
  * Some details are tracked per op template, which aligns to the life-cycle of the op dispenser.
  * Thus, each op dispenser is where the stats for all related operations are kept.
  *
- * @param <T> The type of operation
+ * @param <T>
+ *     The type of operation
  */
 public abstract class BaseOpDispenser<T extends Op, S> implements OpDispenser<T>, NBLabeledElement {
+    private final static Logger logger = LogManager.getLogger(BaseOpDispenser.class);
 
     private final String opName;
     private Serializable expectedResultExpression;
@@ -52,6 +59,7 @@ public abstract class BaseOpDispenser<T extends Op, S> implements OpDispenser<T>
     private Timer errorTimer;
     private final String[] timerStarts;
     private final String[] timerStops;
+    private List<CycleFunction<Boolean>> verifiers = List.of();
 
     protected BaseOpDispenser(final DriverAdapter<T, S> adapter, final ParsedOp op) {
         opName = op.getName();
@@ -59,25 +67,44 @@ public abstract class BaseOpDispenser<T extends Op, S> implements OpDispenser<T>
         labels = op.getLabels();
 
         this.timerStarts = op.takeOptionalStaticValue("start-timers", String.class)
-                .map(s -> s.split(", *"))
-                .orElse(null);
+            .map(s -> s.split(", *"))
+            .orElse(null);
 
         this.timerStops = op.takeOptionalStaticValue("stop-timers", String.class)
-                .map(s -> s.split(", *"))
-                .orElse(null);
+            .map(s -> s.split(", *"))
+            .orElse(null);
 
         if (null != timerStarts)
             for (final String timerStart : this.timerStarts) ThreadLocalNamedTimers.addTimer(op, timerStart);
+
         this.configureInstrumentation(op);
         this.configureResultExpectations(op);
+        this.configureVerifiers(op);
+
     }
 
     public Serializable getExpectedResultExpression() {
         return expectedResultExpression;
     }
 
+    public List<CycleFunction<Boolean>> getVerifiers() {
+        return this.verifiers;
+    }
+
+    private void configureVerifiers(ParsedOp op) {
+        List<String> imports = op.takeOptionalStaticValue("verifier-imports", List.class).orElse(List.of());
+        if (op.isDynamic("imports")) {
+            throw new OpConfigError("You may only define imports as a static list. Dynamic values are not allowed.");
+        }
+
+        op.takeAsOptionalStringTemplate("verifier")
+            .map(tpl -> new GroovyBooleanCycleFunction(tpl,imports))
+            .ifPresent(v -> this.verifiers = List.of(v));
+    }
+
+
     private void configureResultExpectations(ParsedOp op) {
-        op.getOptionalStaticValue("expected-result", String.class)
+        op.takeOptionalStaticValue("expected-result", String.class)
             .map(this::compileExpectedResultExpression)
             .ifPresent(result -> this.expectedResultExpression = result);
     }
@@ -104,7 +131,7 @@ public abstract class BaseOpDispenser<T extends Op, S> implements OpDispenser<T>
         instrument = pop.takeStaticConfigOr("instrument", false);
         if (this.instrument) {
             final int hdrDigits = pop.getStaticConfigOr("hdr_digits", 4).intValue();
-            successTimer = ActivityMetrics.timer(pop, "success",hdrDigits);
+            successTimer = ActivityMetrics.timer(pop, "success", hdrDigits);
             errorTimer = ActivityMetrics.timer(pop, "error", hdrDigits);
             resultSizeHistogram = ActivityMetrics.histogram(pop, "resultset-size", hdrDigits);
         }

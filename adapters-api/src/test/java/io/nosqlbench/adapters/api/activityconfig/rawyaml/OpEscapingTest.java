@@ -21,7 +21,6 @@ import io.nosqlbench.adapters.api.activityconfig.yaml.OpTemplate;
 import io.nosqlbench.adapters.api.activityconfig.yaml.OpsBlock;
 import io.nosqlbench.adapters.api.activityconfig.yaml.OpsDoc;
 import io.nosqlbench.adapters.api.activityconfig.yaml.OpsDocList;
-import io.nosqlbench.engine.api.activityconfig.yaml.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;

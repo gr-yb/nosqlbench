@@ -16,9 +16,9 @@
 
 package io.nosqlbench.adapter.stdout;
 
-import io.nosqlbench.adapters.api.activityimpl.uniform.flowtypes.RunnableOp;
+import io.nosqlbench.adapters.api.activityimpl.uniform.flowtypes.CycleOp;
 
-public class StdoutOp implements RunnableOp {
+public class StdoutOp implements CycleOp<String> {
 
     private final StdoutSpace ctx;
     private final String text;
@@ -29,8 +29,8 @@ public class StdoutOp implements RunnableOp {
     }
 
     @Override
-    public void run() {
+    public String apply(long cycle) {
         ctx.writeflush(text);
-
+        return text;
     }
 }

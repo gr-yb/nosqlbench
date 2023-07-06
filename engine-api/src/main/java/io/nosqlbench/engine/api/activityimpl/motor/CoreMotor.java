@@ -17,7 +17,6 @@ package io.nosqlbench.engine.api.activityimpl.motor;
 
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.Timer;
-import io.nosqlbench.adapters.api.activityapi.core.*;
 import io.nosqlbench.engine.api.activityapi.core.*;
 import io.nosqlbench.engine.api.activityapi.core.ops.fluent.opfacets.TrackedOp;
 import io.nosqlbench.engine.api.activityapi.cyclelog.buffers.op_output.StrideOutputConsumer;

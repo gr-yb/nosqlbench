@@ -20,11 +20,11 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.Timer;
+import io.nosqlbench.api.errors.ResultMismatchError;
 import io.nosqlbench.engine.api.activityapi.errorhandling.ErrorMetrics;
 import io.nosqlbench.engine.api.activityapi.errorhandling.modular.handlers.CountErrorHandler;
 import io.nosqlbench.engine.api.activityapi.errorhandling.modular.handlers.CounterErrorHandler;
 import io.nosqlbench.api.config.NBLabeledElement;
-import io.nosqlbench.api.errors.ExpectedResultVerificationError;
 import io.nosqlbench.util.NBMock;
 import io.nosqlbench.util.NBMock.LogAppender;
 import org.apache.logging.log4j.Level;
@@ -212,7 +212,7 @@ class NBErrorHandlerTest {
         return Stream.of(
             Arguments.of(
                 "retries left",
-                new ExpectedResultVerificationError("error-message", 5, "<expression>"),
+                new ResultMismatchError("error-message", 5, "<expression>"),
                 "Cycle: 1 Verification of result did not pass. 5 retries left.",
                 1,
                 0,
@@ -220,7 +220,7 @@ class NBErrorHandlerTest {
             ),
             Arguments.of(
                 "no retries left",
-                new ExpectedResultVerificationError("error-message", 0, "<expression>"),
+                new ResultMismatchError("error-message", 0, "<expression>"),
                 "Cycle: 1 Verification of result did not pass following expression: <expression>",
                 0,
                 1,

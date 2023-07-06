@@ -17,7 +17,6 @@
 package io.nosqlbench.engine.api.activityimpl;
 
 import com.codahale.metrics.Timer;
-import io.nosqlbench.adapters.api.activityapi.core.*;
 import io.nosqlbench.engine.api.activityapi.core.*;
 import io.nosqlbench.engine.api.activityapi.core.progress.ActivityMetricProgressMeter;
 import io.nosqlbench.engine.api.activityapi.core.progress.ProgressMeterDisplay;

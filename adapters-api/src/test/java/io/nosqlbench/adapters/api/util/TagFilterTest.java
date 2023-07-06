@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.util;
+package io.nosqlbench.adapters.api.util;
 
-import io.nosqlbench.adapters.api.util.TagFilter;
 import io.nosqlbench.api.engine.util.Tagged;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

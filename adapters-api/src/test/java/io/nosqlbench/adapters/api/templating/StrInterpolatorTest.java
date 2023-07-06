@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.engine.api.templating;
+package io.nosqlbench.adapters.api.templating;
 
-import io.nosqlbench.adapters.api.templating.StrInterpolator;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

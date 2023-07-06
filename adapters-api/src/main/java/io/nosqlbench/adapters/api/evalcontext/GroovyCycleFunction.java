@@ -32,12 +32,13 @@ import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class GroovyCycleFunction<T> implements CycleFunction<T> {
     private final static Logger logger = LogManager.getLogger(GroovyBooleanCycleFunction.class);
+    private final String name;
+    private final List<String> imports;
 
-    protected String originalExpression; // Groovy script as provided
+    protected String scriptText; // Groovy script as provided
     protected final Script script; // Groovy Script as compiled
     protected final Binding variableBindings; // Groovy binding layer
     protected final Bindings bindingFunctions; // NB bindings
@@ -48,8 +49,10 @@ public class GroovyCycleFunction<T> implements CycleFunction<T> {
      * @param bindingSpecs The names and recipes of bindings which are referenced in the scriptText
      * @param imports The package imports to be installed into the execution environment
      */
-    public GroovyCycleFunction(String scriptText, Map<String,String> bindingSpecs, List<String> imports) {
-        this.originalExpression=scriptText;
+    public GroovyCycleFunction(String name, String scriptText, Map<String,String> bindingSpecs, List<String> imports) {
+        this.name = name;
+        this.scriptText =scriptText;
+        this.imports = imports;
 
         // scripting env variable bindings
         this.variableBindings = new Binding();
@@ -57,6 +60,19 @@ public class GroovyCycleFunction<T> implements CycleFunction<T> {
         // virtdata bindings to be evaluated at cycle time
         this.bindingFunctions = new BindingsTemplate().addFieldBindings(bindingSpecs).resolveBindings();
 
+        this.script = compileScript(this.scriptText, imports);
+    }
+
+    public GroovyCycleFunction(String name, ParsedTemplateString template, List<String> imports) {
+        this(
+            name,
+            template.getPositionalStatement(),
+            resolveBindings(template.getBindPoints()),
+            imports
+        );
+    }
+
+    private Script compileScript(String scriptText, List<String> imports) {
         // add classes which are in the imports to the groovy evaluation context
         String[] verifiedClasses = expandClassNames(imports);
 
@@ -64,22 +80,8 @@ public class GroovyCycleFunction<T> implements CycleFunction<T> {
         ImportCustomizer importer = new ImportCustomizer().addImports(verifiedClasses);
         compilerConfiguration.addCompilationCustomizers(importer);
 
-        GroovyShell gshell = new GroovyShell(variableBindings, compilerConfiguration);
-        this.script = gshell.parse(scriptText);
-    }
-
-    public GroovyCycleFunction(ParsedTemplateString template, List<String> imports) {
-        this(
-            template.getPositionalStatement(),
-            resolveBindings(template.getBindPoints()),
-            imports
-        );
-    }
-
-    private GroovyCycleFunction(Script script, Supplier<Binding> bindingSource, Bindings bindings) {
-        this.script = script;
-        this.bindingFunctions = bindings;
-        this.variableBindings = bindingSource.get();
+        GroovyShell gshell = new GroovyShell(new Binding(), compilerConfiguration);
+        return gshell.parse(scriptText);
     }
 
     private static Map<String, String> resolveBindings(List<BindPoint> bindPoints) {
@@ -108,7 +110,7 @@ public class GroovyCycleFunction<T> implements CycleFunction<T> {
 
     @Override
     public String getExpressionDetails() {
-        return this.originalExpression;
+        return this.scriptText;
     }
 
 
@@ -127,6 +129,18 @@ public class GroovyCycleFunction<T> implements CycleFunction<T> {
 
     @Override
     public CycleFunction<T> newInstance() {
-        return new GroovyCycleFunction<T>(this.script,() -> new Binding(),this.bindingFunctions);
+        return new GroovyCycleFunction<T>(name, scriptText, bindingFunctions,imports);
     }
+
+    private GroovyCycleFunction(String name, String scriptText, Bindings bindingFunctions, List<String> imports) {
+        this.name = name;
+        this.scriptText = scriptText;
+        this.bindingFunctions = bindingFunctions;
+        this.imports = imports;
+
+        this.script = compileScript(scriptText,imports);
+        this.variableBindings=script.getBinding();
+    }
+
+
 }

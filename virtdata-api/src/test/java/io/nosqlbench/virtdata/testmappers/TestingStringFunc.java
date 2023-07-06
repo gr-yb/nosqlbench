@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 nosqlbench
+ * Copyright (c) 2022 nosqlbench
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.adapters.api.evalcontext;
+package io.nosqlbench.virtdata.testmappers;
 
-import io.nosqlbench.virtdata.core.templates.ParsedTemplateString;
+import io.nosqlbench.virtdata.api.annotations.ThreadSafeMapper;
 
-import java.util.List;
+import java.util.function.LongFunction;
 
-public class GroovyBooleanCycleFunction extends GroovyCycleFunction<Boolean> {
+@ThreadSafeMapper
+public class TestingStringFunc implements LongFunction<String> {
 
-    public GroovyBooleanCycleFunction(String name, ParsedTemplateString template, List<String> imports) {
-        super(name, template, imports);
+    private final String stringValue;
+
+    public TestingStringFunc(String stringValue) {
+        this.stringValue = stringValue;
     }
 
     @Override
-    public Boolean apply(long value) {
-        return super.apply(value);
+    public String apply(long value) {
+        return stringValue;
     }
-
 }

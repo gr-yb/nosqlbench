@@ -728,6 +728,69 @@ public class ParsedTemplateMap implements LongFunction<Map<String, ?>>, StaticFi
         return Optional.empty();
     }
 
+    public <V> Optional<V> takeAsOptionalRawSpecifier(String field) {
+        if (dynamics.containsKey(name)) {
+            Object value = statics.remove(name);
+            protomap.remove(name);
+            return (Optional<V>) Optional.of(value);
+        }
+        if (statics.containsKey(name)) {
+            Object value = statics.remove(name);
+            protomap.remove(name);
+            return (Optional<V>) Optional.of(value);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Take the value of the specified field from the dynamic or static layers, or reference it
+     * from the config layer without removal. Then, flatten any string, list, or map structures
+     * into a map of strings with names injected as needed. Then, convert the values to string
+     * templates and return that.
+     * @param fieldname the field to take the templates from
+     * @return A map of templates, or an empty map if the field is not defined or is empty.
+     */
+    public Map<String,ParsedTemplateString> takeAsNamedTemplates(String fieldname) {
+        Object entry = originalTemplateObject.remove(fieldname);
+        dynamics.remove(fieldname);
+        statics.remove(fieldname);
+        protomap.remove(fieldname);
+        if (entry==null) {
+            for (Map<String, Object> cfgsource : cfgsources) {
+                if (cfgsource.containsKey(fieldname)) {
+                    entry = cfgsource.get(fieldname);
+                    break;
+                }
+            }
+        }
+
+        if (entry==null) {
+            return Map.of();
+        }
+
+        Map<String,Object> elements = new LinkedHashMap<>();
+        if (entry instanceof CharSequence chars) {
+            elements.put(this.getName()+"-verifier-0",chars.toString());
+        } else if (entry instanceof List list) {
+            for (int i = 0; i < list.size(); i++) {
+                elements.put(this.getName()+"-verifier-"+i,list.get(0));
+            }
+        } else if (entry instanceof Map map) {
+            map.forEach((k,v) -> {
+                elements.put(this.getName()+"-verifier-"+k,v);
+            });
+        }
+        Map<String,ParsedTemplateString> parsedStringTemplates
+            = new LinkedHashMap<>();
+        elements.forEach((k,v) -> {
+            if (v instanceof CharSequence chars) {
+                parsedStringTemplates.put(k,new ParsedTemplateString(chars.toString(), this.bindings));
+            }
+        });
+        return parsedStringTemplates;
+    }
+
+
     public Optional<ParsedTemplateString> getAsStringTemplate(String fieldname) {
         if (originalTemplateObject.containsKey(fieldname)) {
             Object fval = originalTemplateObject.get(fieldname);
@@ -1026,5 +1089,6 @@ public class ParsedTemplateMap implements LongFunction<Map<String, ?>>, StaticFi
         }
         return sb.toString();
     }
+
 
 }

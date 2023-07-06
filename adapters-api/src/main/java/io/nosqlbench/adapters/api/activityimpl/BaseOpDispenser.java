@@ -21,6 +21,7 @@ import com.codahale.metrics.Timer;
 import io.nosqlbench.adapters.api.activityimpl.uniform.DriverAdapter;
 import io.nosqlbench.adapters.api.activityimpl.uniform.flowtypes.Op;
 import io.nosqlbench.adapters.api.evalcontext.CycleFunction;
+import io.nosqlbench.adapters.api.evalcontext.CycleFunctions;
 import io.nosqlbench.adapters.api.evalcontext.GroovyBooleanCycleFunction;
 import io.nosqlbench.adapters.api.evalcontext.GroovyObjectEqualityFunction;
 import io.nosqlbench.adapters.api.metrics.ThreadLocalNamedTimers;
@@ -32,6 +33,7 @@ import io.nosqlbench.api.errors.OpConfigError;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -56,8 +58,18 @@ public abstract class BaseOpDispenser<T extends Op, S> implements OpDispenser<T>
     private Timer errorTimer;
     private final String[] timerStarts;
     private final String[] timerStops;
-    private List<CycleFunction<Boolean>> resultAssertionVerifiers = List.of();
-    private CycleFunction<Boolean> resultEqualityVerifier;
+
+    /**
+     * package imports used with "verifiers" or "expected-result" are accumulated here
+     */
+    private final List verifierImports = new ArrayList();
+    /**
+     * optional invokable functions which throw exceptions when results are not verifiable.
+     * This variable is kept here for diagnostics and debugging. The actual instance used within
+     * each thread is provided by a {@link ThreadLocal} via {@link #getVerifier()}
+     */
+    private final CycleFunction<Boolean> _verifier;
+    private final ThreadLocal<CycleFunction<Boolean>> tlVerifier;
 
     protected BaseOpDispenser(final DriverAdapter<T, S> adapter, final ParsedOp op) {
         opName = op.getName();
@@ -76,45 +88,61 @@ public abstract class BaseOpDispenser<T extends Op, S> implements OpDispenser<T>
             for (final String timerStart : this.timerStarts) ThreadLocalNamedTimers.addTimer(op, timerStart);
 
         this.configureInstrumentation(op);
-        this.configureEqualityVerifier(op);
-        this.configureAssertionVerifiers(op);
+        this.configureVerifierImports(op);
+        List<CycleFunction<Boolean>> verifiers = new ArrayList<>();
+        verifiers.addAll(configureEqualityVerifier(op));
+        verifiers.addAll(configureAssertionVerifiers(op));
+        this._verifier = CycleFunctions.of((a, b) -> a&&b, verifiers, true);
+        this.tlVerifier = ThreadLocal.withInitial(() -> _verifier.newInstance());
     }
 
-    public CycleFunction<Boolean> getResultEqualityVerifier() {
-        return resultEqualityVerifier;
+    private CycleFunction<Boolean> cloneVerifiers() {
+        return this._verifier.newInstance();
     }
 
-    public List<CycleFunction<Boolean>> getResultAssertionVerifiers() {
-        return this.resultAssertionVerifiers;
+    public CycleFunction<Boolean> getVerifier() {
+        return this.tlVerifier.get();
     }
 
-    private void configureAssertionVerifiers(ParsedOp op) {
-        List<String> imports = op.takeOptionalStaticValue("verifier-imports", List.class).orElse(List.of());
-        if (op.isDynamic("imports")) {
-            throw new OpConfigError("You may only define imports as a static list. Dynamic values are not allowed.");
+    private void configureVerifierImports(ParsedOp op) {
+        List imports = op.takeOptionalStaticValue("verifier-imports", List.class)
+            .orElse(List.of());
+        for (Object element : imports) {
+            if (element instanceof CharSequence cs) {
+                this.verifierImports.add(cs.toString());
+            } else {
+                throw new RuntimeException("Imports must be a character sequence.");
+            }
         }
+    }
 
+    private List<? extends CycleFunction<Boolean>> configureAssertionVerifiers(ParsedOp op) {
         try {
-            op.takeAsOptionalStringTemplate("verifier")
-                .map(tpl -> new GroovyBooleanCycleFunction(tpl, imports))
-                .ifPresent(v -> this.resultAssertionVerifiers = List.of(v));
+            return op.takeAsOptionalStringTemplate("verifier")
+                .map(tpl -> new GroovyBooleanCycleFunction(tpl, verifierImports))
+                .map(vl -> {
+                    logger.info("Configured assertion verifiers: " + vl);
+                    return vl;
+                })
+                .map(v -> List.of(v))
+                .orElse(List.of());
         } catch (Exception gre) {
-            throw new OpConfigError("error in verifier:" + gre.getMessage(),gre);
+            throw new OpConfigError("error in verifier:" + gre.getMessage(), gre);
         }
     }
 
-    private void configureEqualityVerifier(ParsedOp op) {
-        List<String> imports = op.takeOptionalStaticValue("verifier-imports", List.class).orElse(List.of());
-        if (op.isDynamic("imports")) {
-            throw new OpConfigError("You may only define imports as a static list. Dynamic values are not allowed.");
-        }
-
+    private List<? extends CycleFunction<Boolean>> configureEqualityVerifier(ParsedOp op) {
         try {
-            op.takeAsOptionalStringTemplate("expected-result")
-                .map(tpl -> new GroovyObjectEqualityFunction(tpl, imports))
-                .ifPresent(v -> this.resultEqualityVerifier = v);
+            return op.takeAsOptionalStringTemplate("expected-result")
+                .map(tpl -> new GroovyObjectEqualityFunction(tpl, verifierImports))
+                .map(vl -> {
+                    logger.info("Configured equality verifier: " + vl);
+                    return vl;
+                })
+                .map(v -> List.of(v))
+                .orElse(List.of());
         } catch (Exception gre) {
-            throw new OpConfigError("error in verifier:" + gre.getMessage(),gre);
+            throw new OpConfigError("error in verifier:" + gre.getMessage(), gre);
         }
     }
 

@@ -20,5 +20,9 @@ package io.nosqlbench.adapters.api.evalcontext;
  * Implementors of this type can have variables set on them for later use.
  */
 public interface VariableInjectable {
+
+    /**
+     * Set a variable by name.
+     */
     <V> void setVariable(String name, V value);
 }

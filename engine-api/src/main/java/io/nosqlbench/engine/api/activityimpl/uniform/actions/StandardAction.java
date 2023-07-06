@@ -109,26 +109,16 @@ public class StandardAction<A extends StandardActivity<R, ?>, R extends Op> impl
                             "one of [RunnableOp, CycleOp, or ChainingOp]");
                     }
 
-                    for (CycleFunction<Boolean> verifier : dispenser.getResultAssertionVerifiers()) {
-                        try {
-                            verifier.setVariable("result", result);
-                            Boolean isGood = verifier.apply(cycle);
-                            if (!isGood) {
-                                throw new ResultVerificationError("assertion failed", maxTries - tries, verifier.getExpressionDetails());
-                            }
-                        } catch (Exception e) {
-                            throw new ResultVerificationError(e, maxTries - tries, verifier.getExpressionDetails());
+                    CycleFunction<Boolean> verifier = dispenser.getVerifier();
+                    try {
+                        verifier.setVariable("result", result);
+                        Boolean isGood = verifier.apply(cycle);
+                        if (!isGood) {
+                            throw new ResultVerificationError("result verification failed", maxTries - tries, verifier.getExpressionDetails());
                         }
-
+                    } catch (Exception e) {
+                        throw new ResultVerificationError(e, maxTries - tries, verifier.getExpressionDetails());
                     }
-
-//                    var expectedResultExpression = dispenser.getExpectedResultExpression();
-//                    if (expectedResultExpression!=null) {
-//                        var verified = MVEL.executeExpression(expectedResultExpression, result, boolean.class);
-//                        if (!verified) {
-//                            throw new ExpectedResultVerificationError(maxTries - tries, expectedResultExpression);
-//                        }
-//                    }
                 } catch (Exception e) {
                     error = e;
                 } finally {

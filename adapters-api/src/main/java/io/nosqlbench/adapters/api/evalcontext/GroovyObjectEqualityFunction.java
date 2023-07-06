@@ -38,8 +38,8 @@ public class GroovyObjectEqualityFunction extends GroovyCycleFunction<Boolean> {
 
     @Override
     public Boolean apply(long value) {
-        Map<String, Object> values = bindings.getAllMap(value);
-        values.forEach((k,v)-> binding.setVariable(k,v));
+        Map<String, Object> values = bindingFunctions.getAllMap(value);
+        values.forEach((k,v)-> variableBindings.setVariable(k,v));
         Object scriptResult= script.run();
         return scriptResult.equals(result);
     }

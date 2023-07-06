@@ -18,7 +18,6 @@ package io.nosqlbench.adapters.api.activityimpl;
 
 import io.nosqlbench.adapters.api.evalcontext.CycleFunction;
 
-import java.util.List;
 import java.util.function.LongFunction;
 
 /**
@@ -84,8 +83,7 @@ public interface OpDispenser<T> extends LongFunction<T>, OpResultTracker {
      */
 
     T apply(long value);
-    CycleFunction<Boolean> getResultEqualityVerifier();
 
-    List<CycleFunction<Boolean>> getResultAssertionVerifiers();
+    CycleFunction<Boolean> getVerifier();
 
 }

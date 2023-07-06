@@ -29,4 +29,10 @@ public interface CycleFunction<T> extends LongFunction<T>, VariableInjectable, E
     @Override
     T apply(long value);
 
+    /**
+     * Get a new instance of a CycleFunction, based on the current one, but with its own instance of any
+     * non-threadsafe elements.
+     * @return A new CycleFunction
+     */
+    CycleFunction<T> newInstance();
 }

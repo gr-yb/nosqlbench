@@ -19,7 +19,6 @@ package io.nosqlbench.adapters.api.evalcontext;
 import io.nosqlbench.virtdata.core.templates.ParsedTemplateString;
 
 import java.util.List;
-import java.util.Map;
 
 public class GroovyBooleanCycleFunction extends GroovyCycleFunction<Boolean> {
 
@@ -29,10 +28,7 @@ public class GroovyBooleanCycleFunction extends GroovyCycleFunction<Boolean> {
 
     @Override
     public Boolean apply(long value) {
-        Map<String, Object> values = bindings.getAllMap(value);
-        values.forEach((k,v)-> binding.setVariable(k,v));
-        boolean result= (boolean) script.run();
-        return result;
+        return super.apply(value);
     }
 
 }

@@ -16,19 +16,23 @@
 
 package io.nosqlbench.adapters.api.evalcontext;
 
-import java.io.Serializable;
+import io.nosqlbench.virtdata.core.templates.ParsedTemplateString;
+
+import java.util.List;
 import java.util.Map;
-import java.util.function.LongFunction;
 
-public class MvelCycleFunction implements CycleFunction<Boolean> {
-    private final Serializable expr;
+public class GroovyBooleanCycleFunction extends GroovyCycleFunction<Boolean> {
 
-    public MvelCycleFunction(LongFunction<Map<String,Object>> ctxMapper, String mvel) {
-        this.expr="";
+    public GroovyBooleanCycleFunction(ParsedTemplateString template, List<String> imports) {
+        super(template, imports);
     }
 
     @Override
     public Boolean apply(long value) {
-        return false;
+        Map<String, Object> values = bindings.getAllMap(value);
+        values.forEach((k,v)-> binding.setVariable(k,v));
+        boolean result= (boolean) script.run();
+        return result;
     }
+
 }

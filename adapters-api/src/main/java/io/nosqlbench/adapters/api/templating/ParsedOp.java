@@ -431,6 +431,10 @@ public class ParsedOp implements LongFunction<Map<String, ?>>, NBLabeledElement,
         return this.tmap.getAsStringTemplate(fieldname);
     }
 
+    public Optional<ParsedTemplateString> takeAsOptionalStringTemplate(String fieldname) {
+        return this.tmap.takeAsOptionalStringTemplate(fieldname);
+    }
+
     /**
      * Get the named static field value, or return the provided default, but throw an exception if
      * the named field is dynamic.
@@ -930,5 +934,9 @@ public class ParsedOp implements LongFunction<Map<String, ?>>, NBLabeledElement,
     @Override
     public NBLabels getLabels() {
         return labels;
+    }
+
+    public Map<String, String> getBindPoints() {
+        return null;
     }
 }

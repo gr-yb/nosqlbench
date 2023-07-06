@@ -16,17 +16,9 @@
 
 package io.nosqlbench.adapters.api.evalcontext;
 
-import java.util.function.LongFunction;
-
-public interface CycleFunction<T> extends LongFunction<T>, VariableInjectable, ExpressionDetails {
-
-    /**
-     * Produce a result from a cycle. This is an encapsulating type for any implementations which need
-     * to
-     * @param value the function argument
-     * @return
-     */
-    @Override
-    T apply(long value);
-
+/**
+ * Implementors of this type can have variables set on them for later use.
+ */
+public interface VariableInjectable {
+    <V> void setVariable(String name, V value);
 }

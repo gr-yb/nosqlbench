@@ -41,8 +41,9 @@ public class PineconeDeleteOp extends PineconeOp {
     }
 
     @Override
-    public void run() {
+    public Object apply(long value) {
         DeleteResponse response = connection.getBlockingStub().delete(request);
         logger.debug("Pinecone delete request successful: " + response.toString());
+        return response;
     }
 }

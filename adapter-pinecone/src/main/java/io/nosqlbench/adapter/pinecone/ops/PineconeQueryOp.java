@@ -43,7 +43,7 @@ public class PineconeQueryOp extends PineconeOp {
     }
 
     @Override
-    public void run() {
+    public Object apply(long value) {
         QueryResponse response = connection.getBlockingStub().query(request);
         if (logger.isDebugEnabled()) {
             for (ScoredVector scored : response.getMatchesList()) {
@@ -55,5 +55,6 @@ public class PineconeQueryOp extends PineconeOp {
                 }
             }
         }
+        return response;
     }
 }

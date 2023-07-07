@@ -41,8 +41,10 @@ public class PineconeUpsertOp extends PineconeOp {
     }
 
     @Override
-    public void run() {
+    public Object apply(long value) {
         UpsertResponse response = connection.getBlockingStub().upsert(request);
         logger.debug("Put " + response.getUpsertedCount() + " vectors into the index");
+        return response;
     }
+
 }

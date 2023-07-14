@@ -43,8 +43,8 @@ public class PineconeDescribeIndexStatsOp extends PineconeOp {
         this.request = request;
     }
 
-    @Override
-    public void run() {
+     @Override
+    public Object apply(long value) {
         DescribeIndexStatsResponse response = connection.getBlockingStub().describeIndexStats(request);
         if (logger.isDebugEnabled()) {
             logger.debug("Vector counts:");
@@ -52,6 +52,6 @@ public class PineconeDescribeIndexStatsOp extends PineconeOp {
                 logger.debug(namespace.getKey() + ": " + namespace.getValue().getVectorCount());
             }
         }
+        return response;
     }
-
 }

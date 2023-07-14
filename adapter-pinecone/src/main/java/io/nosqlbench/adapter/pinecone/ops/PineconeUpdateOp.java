@@ -41,8 +41,9 @@ public class PineconeUpdateOp extends PineconeOp {
     }
 
     @Override
-    public void run() {
+    public Object apply(long value) {
         UpdateResponse response = connection.getBlockingStub().update(request);
         logger.debug("UpdateResponse successful: " + response.toString());
+        return response;
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.nosqlbench.datamappers.functions.to_cqlvector;
+package io.nosqlbench.datamappers.functions.to_cqlvector.from_float_ary;
 
 import com.datastax.oss.driver.api.core.data.CqlVector;
 import io.nosqlbench.virtdata.api.annotations.Categories;
@@ -22,30 +22,17 @@ import io.nosqlbench.virtdata.api.annotations.Category;
 import io.nosqlbench.virtdata.api.annotations.ThreadSafeMapper;
 
 import java.util.function.Function;
-import java.util.List;
 
-/**
- * Convert the incoming object List, Number, or Array to a CqlVector
- * using {@link CqlVector.Builder#add(Object[])}}. If any numeric value
- * is passed in, then it becomes the only component of a 1D vector.
- * Otherwise, the individual values are added as vector components.
- */
 @ThreadSafeMapper
 @Categories(Category.experimental)
-public class ToCqlVector implements Function<Object, CqlVector> {
+public class ToCqlVector implements Function<float[], CqlVector> {
 
     @Override
-    public CqlVector apply(Object object) {
-        Object[] ary = null;
-        if (object instanceof List list) {
-            ary = list.toArray();
-        } else if (object instanceof Number number) {
-            ary = new Object[]{number.floatValue()};
-        } else if (object.getClass().isArray()) {
-            ary = (Object[]) object;
-        } else {
-            throw new RuntimeException("Unsupported input type for CqlVector: " + object.getClass().getCanonicalName());
+    public CqlVector apply(float[] floats) {
+        Float[] numbers = new Float[floats.length];
+        for (int i = 0; i < floats.length; i++) {
+            numbers[i]=floats[i];
         }
-        return CqlVector.of(ary);
+        return CqlVector.newInstance(numbers);
     }
 }

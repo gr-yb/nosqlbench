@@ -23,7 +23,7 @@ import io.nosqlbench.virtdata.api.annotations.ThreadSafeMapper;
 import io.nosqlbench.virtdata.library.basics.shared.from_long.to_vector.NormalizeDoubleListVector;
 import io.nosqlbench.virtdata.library.basics.shared.from_long.to_vector.NormalizeFloatListVector;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -39,22 +39,23 @@ public class NormalizeCqlVector implements Function<CqlVector, CqlVector> {
 
     @Override
     public CqlVector apply(CqlVector cqlVector) {
+        double[] vals = new double[cqlVector.size()];
+        double accumulator= 0.0d;
+        for (int i = 0; i < vals.length; i++) {
+            vals[i]=cqlVector.get(i).doubleValue();
+            accumulator+=vals[i]*vals[i];
+        }
+        double scalarLen = Arrays.stream(vals).map(d -> d * d).sum();
+        double scale = scalarLen;
 
-        List<Object> list = cqlVector.getValues();
-        if (list.isEmpty()) {
-            return CqlVector.of();
-        } else if (list.get(0) instanceof Float) {
-            List<Float> srcFloats = new ArrayList<>(list.size());
-            list.forEach(o -> srcFloats.add((Float) o));
-            List<Float> floats = nfv.apply(srcFloats);
-            return new CqlVector(floats);
-        } else if (list.get(0) instanceof Double) {
-            List<Double> srcDoubles = new ArrayList<>();
-            list.forEach(o -> srcDoubles.add((Double) o));
-            List<Double> doubles = ndv.apply(srcDoubles);
-            return new CqlVector(doubles);
+        if (cqlVector.get(0) instanceof Float) {
+            List<Float> list = Arrays.stream(vals).mapToObj(d -> Float.valueOf((float) (d * scale))).toList();
+            return CqlVector.newInstance(list);
+        } else if (cqlVector.get(0) instanceof Double) {
+            List<Double> list = Arrays.stream(vals).mapToObj(d -> Double.valueOf((float) (d * scale))).toList();
+            return CqlVector.newInstance(list);
         } else {
-            throw new RuntimeException("Only Doubles and Floats are recognized.");
+            throw new RuntimeException(NormalizeCqlVector.class.getCanonicalName()+ " only supports Double and Float type");
         }
     }
 }

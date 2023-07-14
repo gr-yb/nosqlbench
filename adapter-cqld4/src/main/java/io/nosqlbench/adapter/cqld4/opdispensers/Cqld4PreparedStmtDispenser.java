@@ -21,6 +21,7 @@ import com.datastax.oss.driver.api.core.cql.BoundStatement;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.Statement;
 import io.nosqlbench.adapter.cqld4.RSProcessors;
+import io.nosqlbench.adapter.cqld4.diagnostics.CQLD4PreparedStmtDiagnostics;
 import io.nosqlbench.adapter.cqld4.optypes.Cqld4CqlOp;
 import io.nosqlbench.adapter.cqld4.optypes.Cqld4CqlPreparedStatement;
 import io.nosqlbench.adapters.api.activityimpl.uniform.DriverAdapter;

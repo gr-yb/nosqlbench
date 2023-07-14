@@ -83,7 +83,8 @@ description: This is the description for name 'TEMPLATE(myname)'
 ```json
 
 {
-    "name": null
+    "name": default,
+    "description": "This is the description for name 'default'"
 }
 ```
 

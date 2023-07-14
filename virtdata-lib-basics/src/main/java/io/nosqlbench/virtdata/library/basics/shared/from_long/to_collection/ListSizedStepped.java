@@ -56,10 +56,6 @@ public class ListSizedStepped implements LongFunction<List<Object>> {
         }
         this.valueFuncs = VirtDataConversions.adaptFunctionList(funcs, LongFunction.class, Object.class);
     }
-    public ListSizedStepped(int size, Object... funcs) {
-        this.sizeFunc = s -> size;
-        this.valueFuncs = VirtDataConversions.adaptFunctionList(funcs, LongFunction.class, Object.class);
-    }
 
     @Override
     public List<Object> apply(long value) {

@@ -751,10 +751,13 @@ public class ParsedTemplateMap implements LongFunction<Map<String, ?>>, StaticFi
      * @return A map of templates, or an empty map if the field is not defined or is empty.
      */
     public Map<String,ParsedTemplateString> takeAsNamedTemplates(String fieldname) {
-        Object entry = originalTemplateObject.remove(fieldname);
-        dynamics.remove(fieldname);
-        statics.remove(fieldname);
-        protomap.remove(fieldname);
+        Object entry = originalTemplateObject.get(fieldname);
+        if (entry !=null) {
+            dynamics.remove(fieldname);
+            statics.remove(fieldname);
+            protomap.remove(fieldname);
+        }
+
         if (entry==null) {
             for (Map<String, Object> cfgsource : cfgsources) {
                 if (cfgsource.containsKey(fieldname)) {

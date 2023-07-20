@@ -75,7 +75,7 @@ All contributors are expected to abide by the [CODE_OF_CONDUCT](CODE_OF_CONDUCT.
 ## License
 
 All of the code in this repository is licensed under the APL version 2. If you contribute to this project, then you must
-agree to license all of your constributions under this license.
+agree to license all of your contributions under this license.
 
 ## System Compatibility
 
